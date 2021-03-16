@@ -5,36 +5,11 @@ import { head, pipe } from "ramda";
 export const App = () => {
 
     const setup = () => {
-        const state = State.create( {} )
-        addMeshesToScene( State.getScene( state ) )( State.getMeshes( state ) )
-        addLightsToScene( State.getScene( state ) )( State.getLights( state ) )
-        addRendererToDom( document.body )( State.getRenderer( state ) )
+        const state = State.create()
+        addMeshesToScene( state.scene )( state.meshes )
+        addLightsToScene( state.scene )( state.lights )
+        addRendererToDom( document.body )( state.renderer )
         console.log( { state } )
-
-        ///
-        const loader = State.getFbxLoader( state )
-        console.log( { loader } )
-        loader.load( "assets/models/car_2.fbx",
-            function( object ) {
-                console.log( { object } )
-                state.scene.add( object )
-                state.controls.target = object.position.clone()
-                state.controls.update()
-
-                object.traverse( child =>
-                    child.isMesh
-                        ? child.castShadow = child.receiveShadow = true
-                        : null
-                )
-
-            },
-            null,
-            err => {
-                console.error( err )
-            }
-        )
-        ///
-
         return state
     }
 
@@ -58,14 +33,8 @@ export const App = () => {
 
         requestAnimationFrame( () => animate( nextState ) )
 
-        State
-            .getRenderer( nextState )
-            .render(
-                State.getScene( nextState ),
-                State.getCamera( nextState )
-            )
+        nextState.renderer.render( state.scene, state.camera )
     }
-
 
     return {
         run,

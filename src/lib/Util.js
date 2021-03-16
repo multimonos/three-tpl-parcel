@@ -24,7 +24,6 @@ export const addLightsToScene = scene => lights =>
         [isObject, mapObjIndexed( ( v, k, o ) => scene.add( v ) )],
     ] )( lights )
 
-
 export const addMeshesToScene = scene => meshes =>
     cond( [
         [isArray, map( v => scene.add( v ) )],

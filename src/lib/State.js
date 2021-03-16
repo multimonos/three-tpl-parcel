@@ -1,70 +1,69 @@
-import { set, assoc, identity, lens, pipe, prop, view, tap } from "ramda";
-import { AmbientLight, BoxGeometry, Camera, DirectionalLight, Mesh, MeshPhongMaterial, PerspectiveCamera, Scene, WebGLRenderer } from "three";
-import { aspectRatio, height, width } from "./Util";
+import * as t from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import { set, assoc, identity, lens, pipe, prop, view, tap } from "ramda";
+import { aspectRatio, height, width } from "./Util";
+
+const trace = tap( console.log )
 
 const Lens = {
     camera: lens( prop( "camera" ), assoc( "camera" ) ),
+    controls: lens( prop( "controls" ), assoc( "controls" ) ),
     lights: lens( prop( "lights" ), assoc( "lights" ) ),
     meshes: lens( prop( "meshes" ), assoc( "meshes" ) ),
     renderer: lens( prop( "renderer" ), assoc( "renderer" ) ),
     scene: lens( prop( "scene" ), assoc( "scene" ) ),
-    controls: lens( prop( "controls" ), assoc( "controls" ) ),
-    fbxLoader: lens( prop( "fbxLoader" ), assoc( "fbxLoader" ) ),
 }
 
-export const getLights = view( Lens.lights )
-export const getMeshes = view( Lens.meshes )
-export const getRenderer = view( Lens.renderer )
-export const getScene = view( Lens.scene )
-export const getCamera = view( Lens.camera )
-export const getFbxLoader = view( Lens.fbxLoader )
-
-const trace = tap( console.log )
-
-export const create = defaults => {
+export const create = ( defaults = {} ) => {
     let state = pipe(
-        set( Lens.renderer, createRenderer() ),
-        set( Lens.camera, createCamera() ),
-        set( Lens.meshes, createMeshes() ),
         set( Lens.scene, createScene() ),
+        set( Lens.camera, createCamera() ),
+        set( Lens.renderer, createRenderer() ),
+        set( Lens.meshes, createMeshes() ),
         set( Lens.lights, createLights() ),
-        set( Lens.fbxLoader, createFbxLoader() ),
     )( defaults )
 
-    state = set( Lens.controls , createControls( state.camera, state.renderer  ) )(state)
+    state = set( Lens.controls, createControls( state.camera, state.renderer ) )( state )
+
     return state
 }
 
 export const next = state =>
-    state
+    pipe(
+        identity
+    )( state )
+
+const createControls = ( camera, renderer ) =>
+    new OrbitControls( camera, renderer.domElement )
 
 const createCamera = () => {
-    const cam = new PerspectiveCamera(
+    const camera = new t.PerspectiveCamera(
         75,
         aspectRatio(),
         0.1,
         1000,
     )
-    cam.position.z = 3
-    return cam
+    camera.position.z = 3
+    return camera
 }
 
-const createScene = () =>
-    new Scene()
+const createScene = () => {
+    const scene = new t.Scene()
+    scene.background = new t.Color( 0xa0a0a0 )
+    return scene
+}
 
 const createRenderer = () => {
-    const rnd = new WebGLRenderer()
-    rnd.setSize( width(), height() )
-    return rnd
+    const renderer = new t.WebGLRenderer()
+    renderer.setSize( width(), height() )
+    return renderer
 }
 
 const createLights = () => {
-    const directional = new DirectionalLight( 0xffffff )
+    const directional = new t.DirectionalLight( 0xffffff )
     directional.position.set( 0, 20, 10 )
 
-    const ambient = new AmbientLight( 0x707070 )
+    const ambient = new t.AmbientLight( 0x707070 )
 
     return [
         directional,
@@ -73,16 +72,11 @@ const createLights = () => {
 }
 
 const createMeshes = () => {
-    const geo = new BoxGeometry()
-    const mat = new MeshPhongMaterial( { color: 0x00aaff } )
-    const box = new Mesh( geo, mat )
+    const geo = new t.BoxGeometry()
+    const mat = new t.MeshPhongMaterial( { color: 0x00aaff } )
+    const box = new t.Mesh( geo, mat )
     return [
         box,
     ]
 }
 
-const createControls = ( camera, renderer ) =>
-    new OrbitControls( camera, renderer.domElement )
-
-const createFbxLoader = () =>
-    new FBXLoader()

@@ -13,14 +13,14 @@
     },
     "keywords": [
         "threejs",
-        "parcel"
+        "parceljs",
+        "cannonjs",
+        "ramda"
     ],
     "author": "craig hopgood <searaig@gmail.com> (https://multimonos.com)",
     "license": "MIT",
     "dependencies": {
         "cannon": "^0.6.2",
-        "gsap": "^3.6.0",
-        "perlin-noise-3d": "^0.5.4",
         "ramda": "^0.27.1",
         "three": "^0.126.1"
     },
@@ -30,13 +30,5 @@
         "npm-force-resolutions": "0.0.10",
         "parcel": "^1.12.3",
         "parcel-plugin-static-files-copy": "^2.5.1"
-    },
-    "staticFiles": {
-        "staticPath": [
-            {
-                "staticPath": "src/assets",
-                "staticOutDir": "assets"
-            }
-        ]
     }
 }
