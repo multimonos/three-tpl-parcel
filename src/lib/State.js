@@ -1,6 +1,7 @@
-import { set, assoc, identity, lens, pipe, prop, view } from "ramda";
+import { set, assoc, identity, lens, pipe, prop, view, tap } from "ramda";
 import { AmbientLight, BoxGeometry, Camera, DirectionalLight, Mesh, MeshPhongMaterial, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { aspectRatio, height, width } from "./Util";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 const Lens = {
     camera: lens( prop( "camera" ), assoc( "camera" ) ),
@@ -8,13 +9,14 @@ const Lens = {
     meshes: lens( prop( "meshes" ), assoc( "meshes" ) ),
     renderer: lens( prop( "renderer" ), assoc( "renderer" ) ),
     scene: lens( prop( "scene" ), assoc( "scene" ) ),
+    controls: lens( prop( "controls" ), assoc( "controls" ) ),
 }
 
 export const getLights = view( Lens.lights )
 export const getMeshes = view( Lens.meshes )
 export const getRenderer = view( Lens.renderer )
 export const getScene = view( Lens.scene )
-export const getCamera = view( Lens.camera)
+export const getCamera = view( Lens.camera )
 
 export const create = defaults => pipe(
     set( Lens.renderer, createRenderer() ),
@@ -22,6 +24,7 @@ export const create = defaults => pipe(
     set( Lens.meshes, createMeshes() ),
     set( Lens.scene, createScene() ),
     set( Lens.lights, createLights() ),
+    tap( pipe( createControls, set( Lens.controls ) ) ),
 )( defaults )
 
 export const next = state =>
@@ -67,3 +70,9 @@ const createMeshes = () => {
         box,
     ]
 }
+
+const createControls = state =>
+    new OrbitControls(
+        getCamera( state ),
+        getRenderer( state ).domElement
+    )
