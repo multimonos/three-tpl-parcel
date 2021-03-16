@@ -1,5 +1,5 @@
-import * as State from "./State"
-import { addMeshesToScene, addRendererToDom, addLightsToScene } from "./Util";
+import * as State from "./lib/State"
+import { addMeshesToScene, addRendererToDom, addLightsToScene } from "./lib/Util";
 import { head, pipe } from "ramda";
 
 export const App = () => {

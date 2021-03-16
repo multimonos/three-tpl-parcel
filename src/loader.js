@@ -1,5 +1,5 @@
 import "./style.css"
-import { App } from "./lib/app"
+import { App } from "./app"
 
 
 window.onload = function() {
