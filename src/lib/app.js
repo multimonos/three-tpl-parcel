@@ -34,10 +34,10 @@ export const App = () => {
         requestAnimationFrame( () => animate( nextState ) )
 
         State
-            .getRenderer( state )
+            .getRenderer( nextState )
             .render(
-                State.getScene( state ),
-                State.getCamera( state )
+                State.getScene( nextState ),
+                State.getCamera( nextState )
             )
     }
 
