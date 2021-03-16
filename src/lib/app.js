@@ -9,7 +9,32 @@ export const App = () => {
         addMeshesToScene( State.getScene( state ) )( State.getMeshes( state ) )
         addLightsToScene( State.getScene( state ) )( State.getLights( state ) )
         addRendererToDom( document.body )( State.getRenderer( state ) )
-        // console.log({ state })
+        console.log( { state } )
+
+        ///
+        const loader = State.getFbxLoader( state )
+        console.log( { loader } )
+        loader.load( "assets/models/car_2.fbx",
+            function( object ) {
+                console.log( { object } )
+                state.scene.add( object )
+                state.controls.target = object.position.clone()
+                state.controls.update()
+
+                object.traverse( child =>
+                    child.isMesh
+                        ? child.castShadow = child.receiveShadow = true
+                        : null
+                )
+
+            },
+            null,
+            err => {
+                console.error( err )
+            }
+        )
+        ///
+
         return state
     }
 

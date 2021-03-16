@@ -2,6 +2,7 @@ import { set, assoc, identity, lens, pipe, prop, view, tap } from "ramda";
 import { AmbientLight, BoxGeometry, Camera, DirectionalLight, Mesh, MeshPhongMaterial, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { aspectRatio, height, width } from "./Util";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 const Lens = {
     camera: lens( prop( "camera" ), assoc( "camera" ) ),
@@ -10,6 +11,7 @@ const Lens = {
     renderer: lens( prop( "renderer" ), assoc( "renderer" ) ),
     scene: lens( prop( "scene" ), assoc( "scene" ) ),
     controls: lens( prop( "controls" ), assoc( "controls" ) ),
+    fbxLoader: lens( prop( "fbxLoader" ), assoc( "fbxLoader" ) ),
 }
 
 export const getLights = view( Lens.lights )
@@ -17,15 +19,23 @@ export const getMeshes = view( Lens.meshes )
 export const getRenderer = view( Lens.renderer )
 export const getScene = view( Lens.scene )
 export const getCamera = view( Lens.camera )
+export const getFbxLoader = view( Lens.fbxLoader )
 
-export const create = defaults => pipe(
-    set( Lens.renderer, createRenderer() ),
-    set( Lens.camera, createCamera() ),
-    set( Lens.meshes, createMeshes() ),
-    set( Lens.scene, createScene() ),
-    set( Lens.lights, createLights() ),
-    tap( pipe( createControls, set( Lens.controls ) ) ),
-)( defaults )
+const trace = tap( console.log )
+
+export const create = defaults => {
+    let state = pipe(
+        set( Lens.renderer, createRenderer() ),
+        set( Lens.camera, createCamera() ),
+        set( Lens.meshes, createMeshes() ),
+        set( Lens.scene, createScene() ),
+        set( Lens.lights, createLights() ),
+        set( Lens.fbxLoader, createFbxLoader() ),
+    )( defaults )
+
+    state = set( Lens.controls , createControls( state.camera, state.renderer  ) )(state)
+    return state
+}
 
 export const next = state =>
     state
@@ -71,8 +81,8 @@ const createMeshes = () => {
     ]
 }
 
-const createControls = state =>
-    new OrbitControls(
-        getCamera( state ),
-        getRenderer( state ).domElement
-    )
+const createControls = ( camera, renderer ) =>
+    new OrbitControls( camera, renderer.domElement )
+
+const createFbxLoader = () =>
+    new FBXLoader()
